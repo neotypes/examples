@@ -3,7 +3,7 @@ val scalaTestV = "3.0.5"
 val slickVersion = "3.2.3"
 val circeV = "0.9.3"
 val sttpV = "1.1.13"
-val neotypesV = "0.3.3"
+val neotypesV = "0.4.0"
 
 val commonSettings = Seq(
   scalaVersion := "2.12.7"

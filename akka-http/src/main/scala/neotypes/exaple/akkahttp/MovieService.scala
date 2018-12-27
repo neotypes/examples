@@ -1,13 +1,11 @@
 package neotypes.exaple.akkahttp
 
-import neotypes.{Async, Session}
+import neotypes.Driver
 import neotypes.exaple.akkahttp.MovieService.MovieToActor
 import neotypes.implicits._
-import org.neo4j.driver.v1
-import org.neo4j.driver.v1.Driver
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class MovieService(driver: Driver[Future]) {
 
@@ -45,21 +43,6 @@ class MovieService(driver: Driver[Future]) {
 
   private[this] def toNodes(movieToActor: MovieToActor): Seq[Node] =
     movieToActor.cast.map(c => Node(c, MovieService.LABEL_ACTOR)) :+ Node(movieToActor.movie, MovieService.LABEL_MOVIE)
-}
-
-class Driver[F[+_] : Async](driver: v1.Driver) {
-
-  import Async._
-
-  def readSession[T](sessionWork: Session[F] => F[T]): F[T] = {
-    val session = driver.session().asScala[F]
-    sessionWork(session).flatMap { v =>
-      session.close().map(_ => v)
-    }.recoverWith {
-      case ex: Throwable =>
-        session.close().flatMap(_ => implicitly[Async[F]].failed(ex))
-    }
-  }
 }
 
 object MovieService {

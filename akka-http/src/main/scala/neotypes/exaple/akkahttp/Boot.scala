@@ -19,12 +19,15 @@ object Boot extends App {
 
     val driver = GraphDatabase.driver(config.database.url, AuthTokens.basic(config.database.username, config.database.password))
 
-    val movieService = new MovieService(new Driver[Future](driver))
+    val movieService = new MovieService(driver.asScala[Future])
     val httpRoute = new MovieRoute(movieService)
 
     Http().bindAndHandle(httpRoute.route, config.http.host, config.http.port)
+
+    Runtime.getRuntime().addShutdownHook(new Thread(() =>
+      driver.close()
+    ))
   }
 
   startApplication()
-
 }
