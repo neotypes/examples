@@ -1,16 +1,18 @@
 package neotypes.exaple.akkahttp
 
-import pureconfig.loadConfig
+import pureconfig.{ConfigSource}
+import pureconfig.generic.auto._
 
 case class Config(http: HttpConfig, database: DatabaseConfig)
 
 object Config {
-  def load() =
-    loadConfig[Config] match {
-      case Right(config) => config
-      case Left(error) =>
-        throw new RuntimeException("Cannot read config file, errors:\n" + error.toList.mkString("\n"))
-    }
+  def load(): Config = ConfigSource.default.load[Config] match {
+    case Right(config) => config
+    case Left(error) =>
+      throw new RuntimeException(
+        "Cannot read config file, errors: $error.toList.mkString(\"\\n\")"
+      )
+  }
 }
 
 case class HttpConfig(host: String, port: Int)
